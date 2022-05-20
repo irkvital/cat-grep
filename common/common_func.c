@@ -1,8 +1,8 @@
 #include "../common/common_func.h"
 
 void MainCircle(int argc, char* argv[], int flags) {
+    int string_number = 0;
     for(int row = 1; row < argc; row++) {
-        int string_number = 0;
         if(argv[row][0] != '-') {
             FILE *fp;
             if((fp = fopen(argv[row], "r")) == NULL) {
