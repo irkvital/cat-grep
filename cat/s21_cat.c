@@ -1,6 +1,5 @@
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "../common/common_func.h"
 
 #define SUCCEED 0b0
 #define ERROR 0b1
@@ -13,12 +12,12 @@
 int ParserFlagsCat(int argc, char* argv[]);
 int MinusFlag(char* argv[]);
 int MinusMinusFlag(char* argv[]);
-void MainCircle(int argc, char* argv[], int flags);
+//void MainCircle(int argc, char* argv[], int flags);
 void CheckFlagsBN(int flags, char* current_c, int* string_number);
 void CheckFlagT(int flags, char* current_c, FILE* fp);
 void CheckFlagS(int flags, char* current_c, FILE* fp);
 void CheckFlagE(int flags, char* current_c);
-void ReadAndWrite(FILE* fp, int flags, int* string_number);
+//void ReadAndWrite(FILE* fp, int flags, int* string_number);
 
 int main(int argc, char* argv[]) {
     int flags = ParserFlagsCat(argc, argv);
@@ -81,21 +80,21 @@ int MinusMinusFlag(char* argv[]) {
     return flag;
 }
 
-void MainCircle(int argc, char* argv[], int flags) {
-    int string_number = 0;
-    for(int row = 1; row < argc; row++) {
-        if(argv[row][0] != '-') {
-            FILE *fp;
-            if((fp = fopen(argv[row], "r")) == NULL) {
-                printf("Can't open file: %s\n", argv[row]);
-            } else {
-                // Работа с файлом
-                ReadAndWrite(fp, flags, &string_number);
-                fclose(fp);
-            }
-        }
-    }
-}
+// void MainCircle(int argc, char* argv[], int flags) {
+//     for(int row = 1; row < argc; row++) {
+//         int string_number = 0;
+//         if(argv[row][0] != '-') {
+//             FILE *fp;
+//             if((fp = fopen(argv[row], "r")) == NULL) {
+//                 printf("Can't open file: %s\n", argv[row]);
+//             } else {
+//                 // Работа с файлом
+//                 ReadAndWrite(fp, flags, &string_number);
+//                 fclose(fp);
+//             }
+//         }
+//     }
+// }
 
 void CheckFlagsBN(int flags, char* current_c, int* string_number) {
     if ((flags & B_FLAG) && *current_c != '\n' ) {
