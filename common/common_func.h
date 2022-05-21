@@ -1,9 +1,12 @@
 #ifndef SRC_COMMON_FUNC_H_
 #define SRC_COMMON_FUNC_H_
+
 #include <stdlib.h>
 #include <stdio.h>
 
-void MainCircle(int argc, char* argv[], int flags);
-void ReadAndWrite(FILE* fp, int flags, int* string_number);
+#define START_SIZE_BUFF 100
+
+char* ReadStr(FILE* fp, size_t* size_buff, char* buff);
+char* StartBuffer(size_t size_buff);
 
 #endif  // SRC_COMMON_FUNC_H_

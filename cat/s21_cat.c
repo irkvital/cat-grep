@@ -1,19 +1,4 @@
-#include <string.h>
-#include "../common/common_func.h"
-
-#define SUCCEED 0b0
-#define ERROR 0b1
-#define B_FLAG 0b10
-#define E_FLAG 0b100
-#define N_FLAG 0b1000
-#define S_FLAG 0b10000
-#define T_FLAG 0b100000
-
-int ParserFlagsCat(int argc, char* argv[]);
-int MinusFlag(char* argv[]);
-int MinusMinusFlag(char* argv[]);
-char* ReadStr(FILE* fp, size_t* size_buff, char* buff);
-void Write(FILE* fp, int flags, char* buff, int* string_number);
+#include "../cat/s21_cat.h"
 
 int main(int argc, char* argv[]) {
     int flags = ParserFlagsCat(argc, argv);
@@ -76,37 +61,31 @@ int MinusMinusFlag(char* argv[]) {
     return flag;
 }
 
-void ReadAndWrite(FILE* fp, int flags, int* string_number) {
-    // Начальное выделение памяти
-    size_t size_buff = 100;
-    char* buff = NULL;
-    if(!(buff = (char*)malloc(size_buff * sizeof(char)))) {
-        printf("Can't allocate memory");
-        exit(1);
+void MainCircle(int argc, char* argv[], int flags) {
+    int string_number = 0;
+    for(int row = 1; row < argc; row++) {
+        if(argv[row][0] != '-') {
+            FILE *fp;
+            if((fp = fopen(argv[row], "r")) == NULL) {
+                printf("Can't open file: %s\n", argv[row]);
+            } else {
+                // Работа с файлом
+                ReadAndWrite(fp, flags, &string_number);
+                fclose(fp);
+            }
+        }
     }
+}
+
+void ReadAndWrite(FILE* fp, int flags, int* string_number) {
+    size_t size_buff = START_SIZE_BUFF;
+    char* buff = StartBuffer(size_buff);
     *string_number = 0;
     while(!feof(fp)) {
         buff = ReadStr(fp, &size_buff, buff);
         Write(fp, flags, buff, string_number);
     }
     free(buff);
-}
-
-char* ReadStr(FILE* fp, size_t* size_buff, char* buff) {
-    size_t i = - 1;
-        do {
-            if(i == *size_buff - 1) {
-                *size_buff *= 2;
-                if(!(buff = (char*)realloc(buff, *size_buff * sizeof(char)))) {
-                    printf("Can't allocate memory");
-                    exit(1);
-                }
-            }
-            i++;
-            buff[i] = getc(fp);
-        } while(buff[i] != '\n' && buff[i] != EOF && buff[i] != '\0');
-        buff[i] = '\0';
-        return buff;
 }
 
 void Write(FILE* fp, int flags, char* buff, int* string_number) {

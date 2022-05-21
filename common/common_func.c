@@ -1,17 +1,31 @@
 #include "../common/common_func.h"
+#include "../cat/s21_cat.h"
 
-void MainCircle(int argc, char* argv[], int flags) {
-    int string_number = 0;
-    for(int row = 1; row < argc; row++) {
-        if(argv[row][0] != '-') {
-            FILE *fp;
-            if((fp = fopen(argv[row], "r")) == NULL) {
-                printf("Can't open file: %s\n", argv[row]);
-            } else {
-                // Работа с файлом
-                ReadAndWrite(fp, flags, &string_number);
-                fclose(fp);
+
+
+char* ReadStr(FILE* fp, size_t* size_buff, char* buff) {
+    size_t i = - 1;
+        do {
+            if(i == *size_buff - 1) {
+                *size_buff *= 2;
+                if(!(buff = (char*)realloc(buff, *size_buff * sizeof(char)))) {
+                    printf("Can't allocate memory");
+                    exit(1);
+                }
             }
-        }
+            i++;
+            buff[i] = getc(fp);
+        } while(buff[i] != '\n' && buff[i] != EOF && buff[i] != '\0');
+        buff[i] = '\0';
+        return buff;
+}
+
+char* StartBuffer(size_t size_buff) {
+    // Начальное выделение памяти
+    char* buff = NULL;
+    if(!(buff = (char*)malloc(size_buff * sizeof(char)))) {
+        printf("Can't allocate memory");
+        exit(1);
     }
+    return buff;
 }
