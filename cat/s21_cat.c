@@ -12,10 +12,8 @@
 int ParserFlagsCat(int argc, char* argv[]);
 int MinusFlag(char* argv[]);
 int MinusMinusFlag(char* argv[]);
-void CheckFlagsBN(int flags, char* current_c, int* string_number);
-void CheckFlagT(int flags, char* current_c, FILE* fp);
-void CheckFlagS(int flags, char* current_c, FILE* fp);
-void CheckFlagE(int flags, char* current_c);
+char* ReadStr(FILE* fp, size_t* size_buff, char* buff);
+void Write(FILE* fp, int flags, char* buff, int* string_number);
 
 int main(int argc, char* argv[]) {
     int flags = ParserFlagsCat(argc, argv);
@@ -78,64 +76,73 @@ int MinusMinusFlag(char* argv[]) {
     return flag;
 }
 
-void CheckFlagsBN(int flags, char* current_c, int* string_number) {
-    if ((flags & B_FLAG) && *current_c != '\n' ) {
-            (*string_number)++;
-            printf("%6d  ", *string_number);
-        } else if((flags & B_FLAG) == 0 && (flags & N_FLAG)) {
-            (*string_number)++;
-            printf("%6d  ", *string_number);
-        }
+void ReadAndWrite(FILE* fp, int flags, int* string_number) {
+    // Начальное выделение памяти
+    size_t size_buff = 100;
+    char* buff = NULL;
+    if(!(buff = (char*)malloc(size_buff * sizeof(char)))) {
+        printf("Can't allocate memory");
+        exit(1);
+    }
+    *string_number = 0;
+    while(!feof(fp)) {
+        buff = ReadStr(fp, &size_buff, buff);
+        Write(fp, flags, buff, string_number);
+    }
+    free(buff);
 }
 
-void CheckFlagT(int flags, char* current_c, FILE* fp) {
-    if((flags & T_FLAG) && *current_c == '\t') {
+char* ReadStr(FILE* fp, size_t* size_buff, char* buff) {
+    size_t i = - 1;
+        do {
+            if(i == *size_buff - 1) {
+                *size_buff *= 2;
+                if(!(buff = (char*)realloc(buff, *size_buff * sizeof(char)))) {
+                    printf("Can't allocate memory");
+                    exit(1);
+                }
+            }
+            i++;
+            buff[i] = getc(fp);
+        } while(buff[i] != '\n' && buff[i] != EOF && buff[i] != '\0');
+        buff[i] = '\0';
+        return buff;
+}
+
+void Write(FILE* fp, int flags, char* buff, int* string_number) {
+    //B & N флаги
+    if ((flags & B_FLAG) && buff[0] != '\0' ) {
+        printf("%6d  ", ++(*string_number));
+    } else if((flags & B_FLAG) == 0 && (flags & N_FLAG)) {
+        printf("%6d  ", ++(*string_number));
+    }
+    // S флаг
+    if((flags & S_FLAG) && buff[0] == '\0') {
+        if((flags & S_FLAG) && buff[0] == '\0') {
+        buff[0] = '\n';
+            while(buff[0] == '\n') {
+                buff[0] = fgetc(fp);
+            }
+            if(buff[0] != EOF) {
+                fseek(fp, -1, SEEK_CUR);
+            }
+            buff[0] = '\0';
+        }
+    }
+    // Строка + T флаг
+    for(int i = 0; buff[i]; i++) {
+        if((flags & T_FLAG) && buff[i] == '\t') {
             putchar('^');
             putchar('I');
-            *current_c = fgetc(fp);
+        } else {
+            putchar(buff[i]);
         }
-}
-
-void CheckFlagS(int flags, char* current_c, FILE* fp) {
-    if((flags & S_FLAG) && *current_c == '\n') {
-            while(*current_c == '\n') {
-                *current_c = fgetc(fp);
-            }
-            if(*current_c != EOF) {
-                fseek(fp, -1, SEEK_CUR);
-                *current_c = '\n';
-            } else {
-                putchar('\n');
-            }
-        }
-}
-
-void CheckFlagE(int flags, char* current_c) {
-    if(flags & E_FLAG && *current_c == '\n') {
-            putchar('$');
-        }
-}
-
-
-void ReadAndWrite(FILE* fp, int flags, int* string_number) {
-    char current_c = fgetc(fp);
-    *string_number = 0;
-    while(current_c != EOF) {
-        // Проверка флагов и формирование начала строки
-        CheckFlagsBN(flags, &current_c, string_number);
-        CheckFlagT(flags, &current_c, fp);
-        CheckFlagS(flags, &current_c, fp);
-        // Считывание и запись строки из файла
-        while(current_c != '\n' && current_c != EOF ) {
-            putchar(current_c);
-            current_c = fgetc(fp);
-        }
-        // Проверка флагов и формирование конца строки
-        CheckFlagE(flags, &current_c);
-        if(current_c == '\n') {
-            putchar(current_c);
-        }
-        // Проверка на пустую строку
-        current_c = (current_c != EOF) ? fgetc(fp) : EOF;
+    }
+    // E флаг
+    if(flags & E_FLAG) {
+        putchar('$');
+    }
+    if(!feof(fp)) {
+        putchar('\n');
     }
 }
