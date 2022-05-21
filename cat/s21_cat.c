@@ -1,21 +1,4 @@
-#include <string.h>
-#include "../common/common_func.h"
-
-#define SUCCEED 0b0
-#define ERROR 0b1
-#define B_FLAG 0b10
-#define E_FLAG 0b100
-#define N_FLAG 0b1000
-#define S_FLAG 0b10000
-#define T_FLAG 0b100000
-
-int ParserFlagsCat(int argc, char* argv[]);
-int MinusFlag(char* argv[]);
-int MinusMinusFlag(char* argv[]);
-void CheckFlagsBN(int flags, char* current_c, int* string_number);
-void CheckFlagT(int flags, char* current_c, FILE* fp);
-void CheckFlagS(int flags, char* current_c, FILE* fp);
-void CheckFlagE(int flags, char* current_c);
+#include "../cat/s21_cat.h"
 
 int main(int argc, char* argv[]) {
     int flags = ParserFlagsCat(argc, argv);
@@ -78,64 +61,67 @@ int MinusMinusFlag(char* argv[]) {
     return flag;
 }
 
-void CheckFlagsBN(int flags, char* current_c, int* string_number) {
-    if ((flags & B_FLAG) && *current_c != '\n' ) {
-            (*string_number)++;
-            printf("%6d  ", *string_number);
-        } else if((flags & B_FLAG) == 0 && (flags & N_FLAG)) {
-            (*string_number)++;
-            printf("%6d  ", *string_number);
-        }
-}
-
-void CheckFlagT(int flags, char* current_c, FILE* fp) {
-    if((flags & T_FLAG) && *current_c == '\t') {
-            putchar('^');
-            putchar('I');
-            *current_c = fgetc(fp);
-        }
-}
-
-void CheckFlagS(int flags, char* current_c, FILE* fp) {
-    if((flags & S_FLAG) && *current_c == '\n') {
-            while(*current_c == '\n') {
-                *current_c = fgetc(fp);
-            }
-            if(*current_c != EOF) {
-                fseek(fp, -1, SEEK_CUR);
-                *current_c = '\n';
+void MainCircle(int argc, char* argv[], int flags) {
+    int string_number = 0;
+    for(int row = 1; row < argc; row++) {
+        if(argv[row][0] != '-') {
+            FILE *fp;
+            if((fp = fopen(argv[row], "r")) == NULL) {
+                printf("Can't open file: %s\n", argv[row]);
             } else {
-                putchar('\n');
+                // Работа с файлом
+                ReadAndWrite(fp, flags, &string_number);
+                fclose(fp);
             }
         }
+    }
 }
-
-void CheckFlagE(int flags, char* current_c) {
-    if(flags & E_FLAG && *current_c == '\n') {
-            putchar('$');
-        }
-}
-
 
 void ReadAndWrite(FILE* fp, int flags, int* string_number) {
-    char current_c = fgetc(fp);
+    size_t size_buff = START_SIZE_BUFF;
+    char* buff = StartBuffer(size_buff);
     *string_number = 0;
-    while(current_c != EOF) {
-        // Проверка флагов и формирование начала строки
-        CheckFlagsBN(flags, &current_c, string_number);
-        CheckFlagT(flags, &current_c, fp);
-        CheckFlagS(flags, &current_c, fp);
-        // Считывание и запись строки из файла
-        while(current_c != '\n' && current_c != EOF ) {
-            putchar(current_c);
-            current_c = fgetc(fp);
+    while(!feof(fp)) {
+        buff = ReadStr(fp, &size_buff, buff);
+        Write(fp, flags, buff, string_number);
+    }
+    free(buff);
+}
+
+void Write(FILE* fp, int flags, char* buff, int* string_number) {
+    //B & N флаги
+    if ((flags & B_FLAG) && buff[0] != '\0' ) {
+        printf("%6d  ", ++(*string_number));
+    } else if((flags & B_FLAG) == 0 && (flags & N_FLAG)) {
+        printf("%6d  ", ++(*string_number));
+    }
+    // S флаг
+    if((flags & S_FLAG) && buff[0] == '\0') {
+        if((flags & S_FLAG) && buff[0] == '\0') {
+        buff[0] = '\n';
+            while(buff[0] == '\n') {
+                buff[0] = fgetc(fp);
+            }
+            if(buff[0] != EOF) {
+                fseek(fp, -1, SEEK_CUR);
+            }
+            buff[0] = '\0';
         }
-        // Проверка флагов и формирование конца строки
-        CheckFlagE(flags, &current_c);
-        if(current_c == '\n') {
-            putchar(current_c);
+    }
+    // Строка + T флаг
+    for(int i = 0; buff[i]; i++) {
+        if((flags & T_FLAG) && buff[i] == '\t') {
+            putchar('^');
+            putchar('I');
+        } else {
+            putchar(buff[i]);
         }
-        // Проверка на пустую строку
-        current_c = (current_c != EOF) ? fgetc(fp) : EOF;
+    }
+    // E флаг
+    if(flags & E_FLAG) {
+        putchar('$');
+    }
+    if(!feof(fp)) {
+        putchar('\n');
     }
 }
