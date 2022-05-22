@@ -21,5 +21,6 @@
 int ParserFlagsGrep(int argc, char* argv[]);
 void MainCircle(int argc, char* argv[], int flags);
 void ReadAndWrite(FILE* fp, int flags, char* argv[], regex_t* regex);
+int RegexFlags (int flags);
 
 #endif  // SRC_S21_GREP_H_

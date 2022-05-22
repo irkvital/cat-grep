@@ -1,7 +1,4 @@
 #include "../common/common_func.h"
-#include "../cat/s21_cat.h"
-
-
 
 char* ReadStr(FILE* fp, size_t* size_buff, char* buff) {
     size_t i = - 1;
@@ -32,6 +29,7 @@ char* StartBuffer(size_t size_buff) {
 
 int MinusFlag(char* argv[]) {
     int flags = SUCCEED;
+    printf("!common!");////////////////////////////////////////////////////////
     for(int i = 1; (*argv)[i]; i++) {
         if((*argv)[i] == 'e' || (*argv)[i] == 'E') {
             flags |= E_FLAG;
@@ -46,6 +44,7 @@ int MinusFlag(char* argv[]) {
             flags |= T_FLAG;
     #endif
     #ifdef SRC_S21_GREP_H_
+    printf("!grep!");
         } else if((*argv)[i] == 'i') {
             flags |= I_FLAG;
         } else if((*argv)[i] == 'v') {

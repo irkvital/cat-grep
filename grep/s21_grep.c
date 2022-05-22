@@ -2,6 +2,7 @@
 
 int main(int argc, char* argv[]) {
     int flags = ParserFlagsGrep(argc, argv);
+    flags = (argc > 1) ? flags : ERROR;
     if (flags & ERROR) {
         printf("invalid option");
     } else {
@@ -22,10 +23,23 @@ int ParserFlagsGrep(int argc, char* argv[]) {
     return flags;
 }
 
+int RegexFlags (int flags) {
+    int regex_flags = REG_NEWLINE;
+    if(flags & E_FLAG) {
+        regex_flags |= REG_EXTENDED;
+    }
+    if(flags & I_FLAG) {
+        regex_flags |= REG_ICASE;
+    }
+    return regex_flags;
+}
+
 void MainCircle(int argc, char* argv[], int flags) {
     // Init Regex
     regex_t regex;
-    if(regcomp(&regex, "aa", REG_EXTENDED | REG_NEWLINE)) { // REG_EXTENDED   REG_ICASE -не различать регистр   !! Добавить регулярные выражения
+    int regex_flags = RegexFlags(flags);
+    printf("!%d!%d!", regex_flags, flags);///////////////////////////////////////////////////////
+    if(regcomp(&regex, argv[1], regex_flags)) { //!! Добавить регулярные выражения
         printf("Couldn't compile regex\n");
         exit(1);
     }
