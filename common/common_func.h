@@ -8,8 +8,6 @@
 
 #define SUCCEED 0b0
 #define ERROR 0b1
-#define E_FLAG 0b10
-#define N_FLAG 0b100
 
 int MinusFlag(char* argv[]);
 char* ReadStr(FILE* fp, size_t* size_buff, char* buff);

@@ -4,6 +4,8 @@
 #include <string.h>
 #include "../common/common_func.h"
 
+#define E_FLAG 0b10
+#define N_FLAG 0b100
 #define B_FLAG 0b1000
 #define S_FLAG 0b10000
 #define T_FLAG 0b100000

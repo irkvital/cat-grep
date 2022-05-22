@@ -23,6 +23,28 @@ int ParserFlagsGrep(int argc, char* argv[]) {
     return flags;
 }
 
+int MinusFlag(char* argv[]) {
+    int flags = SUCCEED;
+    for(int i = 1; (*argv)[i]; i++) {
+        if((*argv)[i] == 'e' || (*argv)[i] == 'E') {
+            flags |= E_FLAG;
+        } else if((*argv)[i] == 'n') {
+            flags |= N_FLAG;
+        } else if((*argv)[i] == 'i') {
+            flags |= I_FLAG;
+        } else if((*argv)[i] == 'v') {
+            flags |= V_FLAG;
+        } else if((*argv)[i] == 'c') {
+            flags |= C_FLAG;
+        } else if((*argv)[i] == 'l') {
+            flags |= L_FLAG;
+        } else {
+            flags |= ERROR;
+        }
+    }
+    return flags;
+}
+
 int RegexFlags (int flags) {
     int regex_flags = REG_NEWLINE;
     if(flags & E_FLAG) {
@@ -38,7 +60,6 @@ void MainCircle(int argc, char* argv[], int flags) {
     // Init Regex
     regex_t regex;
     int regex_flags = RegexFlags(flags);
-    printf("!%d!%d!", regex_flags, flags);///////////////////////////////////////////////////////
     if(regcomp(&regex, argv[1], regex_flags)) { //!! Добавить регулярные выражения
         printf("Couldn't compile regex\n");
         exit(1);

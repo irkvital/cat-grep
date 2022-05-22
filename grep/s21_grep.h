@@ -8,6 +8,8 @@
 #define COLORRED "\x1B[1;31m"
 #define COLORDEFAULT "\x1B[0m"
 
+#define E_FLAG 0b10
+#define N_FLAG 0b100
 #define I_FLAG 0b1000
 #define V_FLAG 0b10000
 #define C_FLAG 0b100000

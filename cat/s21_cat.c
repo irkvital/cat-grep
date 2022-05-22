@@ -24,6 +24,26 @@ int ParserFlagsCat(int argc, char* argv[]) {
     return flags;
 }
 
+int MinusFlag(char* argv[]) {
+    int flags = SUCCEED;
+    for(int i = 1; (*argv)[i]; i++) {
+        if((*argv)[i] == 'e' || (*argv)[i] == 'E') {
+            flags |= E_FLAG;
+        } else if((*argv)[i] == 'n') {
+            flags |= N_FLAG;
+        } else if((*argv)[i] == 'b') {
+            flags |= B_FLAG;
+        } else if((*argv)[i] == 's') {
+            flags |= S_FLAG;
+        } else if((*argv)[i] == 't' || (*argv)[i] == 'T') {
+            flags |= T_FLAG;
+        } else {
+            flags |= ERROR;
+        }
+    }
+    return flags;
+}
+
 int MinusMinusFlag(char* argv[]) {
     int flag = SUCCEED;
     char str_b[18] = "--number-nonblank";
