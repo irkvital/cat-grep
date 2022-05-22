@@ -23,44 +23,42 @@ int ParserFlagsGrep(int argc, char* argv[]) {
 }
 
 void MainCircle(int argc, char* argv[], int flags) {
-    int string_number = 0;
+    // Init Regex
+    regex_t regex;
+    if(regcomp(&regex, "aa", REG_EXTENDED | REG_NEWLINE)) { // REG_EXTENDED   REG_ICASE -не различать регистр   !! Добавить регулярные выражения
+        printf("Couldn't compile regex\n");
+        exit(1);
+    }
+    // Open files & work
     for(int row = 1; row < argc; row++) {
         if(argv[row][0] != '-') {
             FILE *fp;
             if((fp = fopen(argv[row], "r")) == NULL) {
                 printf("Can't open file: %s\n", argv[row]);
             } else {
-                // Работа с файлом
-                ReadAndWrite(fp, flags, &string_number);
+                ReadAndWrite(fp, flags, argv, &regex);
                 fclose(fp);
             }
         }
     }
+    regfree(&regex);
 }
 
-void ReadAndWrite(FILE* fp, int flags, int* string_number) {
-    //int length = strlen(fp);
-    regex_t regex;
-    regmatch_t pmatch[3];
-    const size_t nmatch = 3; 
-    int reti = 0, i = 0;
-    reti = regcomp(&regex, "a", REG_EXTENDED | REG_NEWLINE); // REG_EXTENDED   REG_ICASE -не различать регистр
-    if(reti) {
-        printf("Couldn't compile regex\n");
-    } else {
-        reti = regexec(&regex, fp, nmatch, pmatch, 0);
+void ReadAndWrite(FILE* fp, int flags, char* argv[], regex_t* regex) {
+    size_t size_buff = START_SIZE_BUFF;
+    char* buff = StartBuffer(size_buff); // Init buffer
+    int reti = 0;
+    int string_number = 0;
+    while(!feof(fp)) {
+        string_number++;
+        buff = ReadStr(fp, &size_buff, buff);
+        reti = regexec(regex, buff, 0, NULL, 0);
         if(!reti) {
-            //printf("& %lld %lld %lld %lld &\n", pmatch[0].rm_so, pmatch[1].rm_so, pmatch[0].rm_eo, pmatch[1].rm_eo);
-            puts("Match\n");
-            // for(; i < pmatch[0].rm_eo; i++) {
-            //     if(i >= pmatch[0].rm_so && i < pmatch[0].rm_eo) {
-            //         printf(COLORRED "%c", fp[i]);
-            //     } else {
-            //         printf(COLORDEFAULT "%c", fp[i]);
-            //     }
-            // }
-        } else {
-            puts("Not match\n");
+            printf("String number: %d\n", string_number);
         }
     }
+    if(!string_number) {
+        puts("Not match\n");
+    }
+    free(buff);
 }

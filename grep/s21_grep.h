@@ -20,6 +20,6 @@
 
 int ParserFlagsGrep(int argc, char* argv[]);
 void MainCircle(int argc, char* argv[], int flags);
-void ReadAndWrite(FILE* fp, int flags, int* string_number);
+void ReadAndWrite(FILE* fp, int flags, char* argv[], regex_t* regex);
 
 #endif  // SRC_S21_GREP_H_
